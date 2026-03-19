@@ -1,0 +1,3 @@
+<svg class="w-5 h-5 text-surface-400 hover:text-surface-600 dark:hover:text-surface-300 transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+</svg><?php /**PATH D:\jason\jasen\Sobaisu\socialapparatus\storage\framework\views/3d083dbe160fe0899ce5c8ecb53b2fc3.blade.php ENDPATH**/ ?>
