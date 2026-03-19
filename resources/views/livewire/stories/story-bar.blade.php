@@ -25,7 +25,7 @@
             @if($storyUser->id !== auth()->id())
                 <button wire:click="viewUserStories({{ $storyUser->id }})" class="flex-shrink-0 flex flex-col items-center">
                     @php
-                        $hasUnviewed = $storyUser->stories->contains(fn($s) => !$s->viewers->contains('id', auth()->id()));
+                        $hasUnviewed = $storyUser->stories->contains(fn($s) => !$s->views->contains('user_id', auth()->id()));
                     @endphp
                     <div class="relative">
                         <img src="{{ $storyUser->profile_photo_url }}"
