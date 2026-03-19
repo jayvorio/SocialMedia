@@ -71,6 +71,13 @@ class StoryBar extends Component
 
     public function nextStory()
     {
+        $viewingStories = $this->viewingUserId
+            ? Story::where('user_id', $this->viewingUserId)->active()->oldest()->get()
+            : collect();
+        if ($this->currentStoryIndex + 1 >= $viewingStories->count()) {
+            $this->closeViewer();
+            return;
+        }
         $this->currentStoryIndex++;
     }
 
@@ -93,13 +100,19 @@ class StoryBar extends Component
             ->get()
             ->sortByDesc(fn($u) => $u->id === $user->id ? 1 : 0); // Put current user first
 
-        $viewingStories = [];
+        $viewingStories = collect();
         if ($this->viewingUserId) {
             $viewingStories = Story::where('user_id', $this->viewingUserId)
                 ->active()
                 ->with('user.profile')
                 ->oldest()
                 ->get();
+
+            // Clamp index in case it's out of bounds (e.g. story expired or nextStory raced)
+            $this->currentStoryIndex = min(
+                max(0, $this->currentStoryIndex),
+                max(0, $viewingStories->count() - 1)
+            );
 
             // Mark as viewed
             if ($viewingStories->isNotEmpty() && isset($viewingStories[$this->currentStoryIndex])) {

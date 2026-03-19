@@ -129,6 +129,8 @@
 
     <!-- Story Viewer Modal -->
     @if($showViewerModal && count($viewingStories) > 0)
+        @php $currentStory = $viewingStories[$currentStoryIndex] ?? $viewingStories->first(); @endphp
+        @if($currentStory)
         <div class="fixed inset-0 z-50 bg-black" x-data="{ progress: 0 }" x-init="
             let interval = setInterval(() => {
                 progress += 2;
@@ -153,11 +155,11 @@
             <!-- Header -->
             <div class="absolute top-8 left-4 right-4 flex items-center justify-between z-10">
                 <div class="flex items-center space-x-3">
-                    <img src="{{ $viewingStories[$currentStoryIndex]->user->profile_photo_url }}"
+                    <img src="{{ $currentStory->user->profile_photo_url }}"
                          class="w-10 h-10 rounded-full ring-2 ring-white">
                     <div>
-                        <p class="text-white font-semibold">{{ $viewingStories[$currentStoryIndex]->user->name }}</p>
-                        <p class="text-white/70 text-xs">{{ $viewingStories[$currentStoryIndex]->created_at->diffForHumans() }}</p>
+                        <p class="text-white font-semibold">{{ $currentStory->user->name }}</p>
+                        <p class="text-white/70 text-xs">{{ $currentStory->created_at->diffForHumans() }}</p>
                     </div>
                 </div>
                 <button wire:click="closeViewer" class="text-white p-2">
@@ -169,7 +171,6 @@
 
             <!-- Story Content -->
             <div class="absolute inset-0 flex items-center justify-center">
-                @php $currentStory = $viewingStories[$currentStoryIndex] ?? null; @endphp
                 @if($currentStory)
                     @if($currentStory->type === 'text')
                         <div class="w-full h-full flex items-center justify-center p-8" style="background-color: {{ $currentStory->background_color }}">
@@ -187,5 +188,6 @@
             <button wire:click="prevStory" class="absolute left-0 top-0 bottom-0 w-1/3 z-10" @if($currentStoryIndex === 0) disabled @endif></button>
             <button wire:click="nextStory" class="absolute right-0 top-0 bottom-0 w-1/3 z-10"></button>
         </div>
+        @endif
     @endif
 </div>
