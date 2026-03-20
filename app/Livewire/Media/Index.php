@@ -13,6 +13,16 @@ class Index extends Component
 
     public string $filter = 'photos';
 
+    protected $listeners = [
+        'mediaUploaded' => 'handleMediaUploaded',
+    ];
+
+    public function handleMediaUploaded(): void
+    {
+        // Refresh the paginated grid after new media is stored.
+        $this->resetPage();
+    }
+
     public function setFilter($filter)
     {
         $this->filter = $filter;

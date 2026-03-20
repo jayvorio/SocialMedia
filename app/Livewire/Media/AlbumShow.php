@@ -13,6 +13,16 @@ class AlbumShow extends Component
 
     public Album $album;
 
+    protected $listeners = [
+        'mediaUploaded' => 'handleMediaUploaded',
+    ];
+
+    public function handleMediaUploaded(): void
+    {
+        // Refresh the paginated album grid after new media is stored.
+        $this->resetPage();
+    }
+
     public function mount(Album $album)
     {
         $user = auth()->user();

@@ -2,15 +2,15 @@
     @if ($showModal)
         <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
             <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="closeModal"></div>
+                        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity z-10" wire:click="$cancelUpload('files'); closeModal()"></div>
 
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
 
-                <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full relative z-20">
                     <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Upload Media</h3>
-                            <button wire:click="closeModal" class="text-gray-400 hover:text-gray-500">
+                            <button wire:click="$cancelUpload('files'); closeModal()" class="text-gray-400 hover:text-gray-500">
                                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
@@ -47,16 +47,20 @@
                             </div>
                         </div>
 
-                        <!-- Selected Files -->
-                        @if (count($uploadedFiles) > 0)
+                        <!-- Selected Files (names only; avoid temporaryUrl to keep JS upload stable) -->
+                        @if (count($files ?? []) > 0)
                             <div class="mb-4">
-                                <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Selected Files ({{ count($uploadedFiles) }})</h4>
+                                <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Selected Files ({{ count($files ?? []) }})</h4>
                                 <div class="space-y-2 max-h-40 overflow-y-auto">
-                                    @foreach ($uploadedFiles as $index => $file)
+                                    @foreach (($files ?? []) as $index => $file)
                                         <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-2 rounded">
                                             <div class="flex items-center min-w-0">
-                                                @if ($file['preview'])
-                                                    <img src="{{ $file['preview'] }}" class="w-10 h-10 object-cover rounded mr-2">
+                                                @if ($file && $file->isPreviewable())
+                                                    <img
+                                                        src="{{ $file->temporaryUrl() }}"
+                                                        class="w-10 h-10 object-cover rounded mr-2"
+                                                        alt="Selected file"
+                                                    >
                                                 @else
                                                     <div class="w-10 h-10 bg-gray-200 dark:bg-gray-600 rounded mr-2 flex items-center justify-center">
                                                         <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,15 +69,12 @@
                                                     </div>
                                                 @endif
                                                 <div class="min-w-0">
-                                                    <p class="text-sm text-gray-900 dark:text-gray-100 truncate">{{ $file['name'] }}</p>
-                                                    <p class="text-xs text-gray-500">{{ number_format($file['size'] / 1024 / 1024, 2) }} MB</p>
+                                                    <p class="text-sm text-gray-900 dark:text-gray-100 truncate">{{ $file->getClientOriginalName() }}</p>
+                                                    <p class="text-xs text-gray-500">{{ number_format($file->getSize() / 1024 / 1024, 2) }} MB</p>
                                                 </div>
                                             </div>
-                                            <button wire:click="removeFile({{ $index }})" class="text-red-500 hover:text-red-700 ml-2">
-                                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </button>
+                                            {{-- Avoid remove buttons for now: it can desync the JS upload manager state --}}
+                                            {{-- <button wire:click="removeFile({{ $index }})" class="text-red-500 hover:text-red-700 ml-2">...</button> --}}
                                         </div>
                                     @endforeach
                                 </div>
@@ -103,17 +104,19 @@
                     </div>
 
                     <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <form wire:submit.prevent="store" class="w-full sm:w-auto">
+                            <button
+                                type="submit"
+                                wire:loading.attr="disabled"
+                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
+                                {{ count($files ?? []) === 0 ? 'disabled' : '' }}
+                            >
+                                <span wire:loading.remove wire:target="store">Upload {{ count($files ?? []) }} {{ Str::plural('file', count($files ?? [])) }}</span>
+                                <span wire:loading wire:target="store">Uploading...</span>
+                            </button>
+                        </form>
                         <button
-                            wire:click="upload"
-                            wire:loading.attr="disabled"
-                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
-                            {{ count($uploadedFiles) === 0 ? 'disabled' : '' }}
-                        >
-                            <span wire:loading.remove wire:target="upload">Upload {{ count($uploadedFiles) }} {{ Str::plural('file', count($uploadedFiles)) }}</span>
-                            <span wire:loading wire:target="upload">Uploading...</span>
-                        </button>
-                        <button
-                            wire:click="closeModal"
+                            wire:click="$cancelUpload('files'); closeModal()"
                             class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
                         >
                             Cancel

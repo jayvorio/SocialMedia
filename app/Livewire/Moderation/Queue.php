@@ -74,21 +74,21 @@ class Queue extends Component
         // Handle the action
         switch ($this->actionType) {
             case 'approve':
-                $this->activeItem->update(['status' => 'approved', 'reviewed_by' => auth()->id(), 'reviewed_at' => now()]);
+                $this->activeItem->update(['status' => 'approved', 'moderated_by' => auth()->id(), 'moderated_at' => now()]);
                 if ($this->activeItem->reportable) {
                     $this->activeItem->reportable->update(['moderation_status' => 'approved']);
                 }
                 break;
 
             case 'remove':
-                $this->activeItem->update(['status' => 'removed', 'reviewed_by' => auth()->id(), 'reviewed_at' => now()]);
+                $this->activeItem->update(['status' => 'removed', 'moderated_by' => auth()->id(), 'moderated_at' => now()]);
                 if ($this->activeItem->reportable) {
                     $this->activeItem->reportable->update(['moderation_status' => 'removed', 'is_hidden' => true]);
                 }
                 break;
 
             case 'warn':
-                $this->activeItem->update(['status' => 'warned', 'reviewed_by' => auth()->id(), 'reviewed_at' => now()]);
+                $this->activeItem->update(['status' => 'warned', 'moderated_by' => auth()->id(), 'moderated_at' => now()]);
                 if ($this->sendWarning && $this->activeItem->user_id) {
                     \App\Models\UserWarning::create([
                         'user_id' => $this->activeItem->user_id,
@@ -102,7 +102,7 @@ class Queue extends Component
                 break;
 
             case 'ban':
-                $this->activeItem->update(['status' => 'banned', 'reviewed_by' => auth()->id(), 'reviewed_at' => now()]);
+                $this->activeItem->update(['status' => 'banned', 'moderated_by' => auth()->id(), 'moderated_at' => now()]);
                 if ($this->activeItem->user_id) {
                     // Ban the user
                     \App\Models\User::where('id', $this->activeItem->user_id)->update(['is_banned' => true, 'banned_at' => now()]);
@@ -110,7 +110,7 @@ class Queue extends Component
                 break;
 
             case 'dismiss':
-                $this->activeItem->update(['status' => 'dismissed', 'reviewed_by' => auth()->id(), 'reviewed_at' => now()]);
+                $this->activeItem->update(['status' => 'dismissed', 'moderated_by' => auth()->id(), 'moderated_at' => now()]);
                 break;
         }
 
@@ -121,7 +121,9 @@ class Queue extends Component
     public function escalate($itemId)
     {
         $item = ModerationQueue::findOrFail($itemId);
-        $item->update(['priority' => 'high', 'is_escalated' => true]);
+        // moderation_queue has no `is_escalated` column in the current schema.
+        // Escalation is represented by setting status to `escalated`.
+        $item->update(['priority' => 'high', 'status' => 'escalated']);
     }
 
     public function assignToMe($itemId)
@@ -139,7 +141,7 @@ class Queue extends Component
         } elseif ($this->filter === 'assigned') {
             $query->where('assigned_to', auth()->id());
         } elseif ($this->filter === 'escalated') {
-            $query->where('is_escalated', true)->where('status', 'pending');
+            $query->where('status', 'escalated');
         } else {
             // All
         }
@@ -158,8 +160,8 @@ class Queue extends Component
 
         $stats = [
             'pending' => ModerationQueue::where('status', 'pending')->count(),
-            'escalated' => ModerationQueue::where('is_escalated', true)->where('status', 'pending')->count(),
-            'todayReviewed' => ModerationQueue::whereDate('reviewed_at', today())->count(),
+            'escalated' => ModerationQueue::where('status', 'escalated')->count(),
+            'todayReviewed' => ModerationQueue::whereDate('moderated_at', today())->count(),
         ];
 
         return view('livewire.moderation.queue', [

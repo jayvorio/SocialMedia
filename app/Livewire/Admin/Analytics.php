@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\PlatformMetric;
 use App\Models\AdminInsight;
 use App\Models\User;
+use App\Models\LoginSession;
 use App\Models\Post;
 use App\Models\Group;
 use Livewire\Component;
@@ -34,7 +35,13 @@ class Analytics extends Component
         $this->metrics = [
             'total_users' => User::count(),
             'new_users' => User::where('created_at', '>=', now()->subDays($days))->count(),
-            'active_users' => User::where('last_activity_at', '>=', now()->subDays($days))->count(),
+            // "Active" is based on recent login activity (last_activity_at) stored per login session.
+            // Count distinct users who have at least one session active within the selected window.
+            'active_users' => LoginSession::query()
+                ->whereNotNull('last_activity_at')
+                ->where('last_activity_at', '>=', now()->subDays($days))
+                ->distinct('user_id')
+                ->count('user_id'),
             'total_posts' => Post::count(),
             'new_posts' => Post::where('created_at', '>=', now()->subDays($days))->count(),
             'total_groups' => Group::count(),

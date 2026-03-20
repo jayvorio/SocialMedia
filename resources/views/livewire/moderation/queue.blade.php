@@ -69,7 +69,7 @@
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                     @foreach($items as $item)
-                        <tr class="{{ $item->is_escalated ? 'bg-orange-50 dark:bg-orange-900/10' : '' }}">
+                        <tr class="{{ $item->status === 'escalated' ? 'bg-orange-50 dark:bg-orange-900/10' : '' }}">
                             <td class="px-6 py-4">
                                 <div class="flex items-center">
                                     @if($item->user)
@@ -109,7 +109,7 @@
                                 @if(!$item->assigned_to)
                                     <button wire:click="assignToMe({{ $item->id }})" class="text-gray-600 hover:text-gray-800 text-sm">Assign</button>
                                 @endif
-                                @if(!$item->is_escalated)
+                                @if($item->status !== 'escalated')
                                     <button wire:click="escalate({{ $item->id }})" class="text-orange-600 hover:text-orange-800 text-sm">Escalate</button>
                                 @endif
                             </td>
