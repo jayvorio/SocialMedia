@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/mrshanebarron/socialapparatus/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
+  <a href="https://github.com/jayvorio/SocialMedia/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
   <img src="https://img.shields.io/badge/Laravel-12.x-FF2D20?logo=laravel" alt="Laravel 12">
   <img src="https://img.shields.io/badge/Livewire-3.x-FB70A9?logo=livewire" alt="Livewire 3">
   <img src="https://img.shields.io/badge/PHP-8.2+-777BB4?logo=php" alt="PHP 8.2+">
@@ -20,7 +20,7 @@
   <a href="https://socialapparatus.com">Website</a> •
   <a href="https://socialapparatus.com/docs">Documentation</a> •
   <a href="https://community.socialapparatus.com">Live Demo</a> •
-  <a href="https://github.com/mrshanebarron/socialapparatus/issues">Issues</a>
+  <a href="https://github.com/jayvorio/SocialMedia/issues">Issues</a>
 </p>
 
 ---
@@ -98,7 +98,7 @@ SocialApparatus is a complete, self-hosted social networking platform that gives
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/mrshanebarron/socialapparatus.git
+git clone https://github.com/jayvorio/SocialMedia.git
 cd socialapparatus
 ```
 
@@ -223,38 +223,5 @@ autorestart=true
 numprocs=2
 ```
 
-## Documentation
 
-Full documentation is available at [socialapparatus.com/docs](https://socialapparatus.com/docs)
 
-- [Getting Started](https://socialapparatus.com/docs/getting-started)
-- [Installation Guide](https://socialapparatus.com/docs/installation)
-- [Configuration](https://socialapparatus.com/docs/configuration)
-- [Features Overview](https://socialapparatus.com/docs/features)
-- [Theming](https://socialapparatus.com/docs/theming)
-- [API Reference](https://socialapparatus.com/docs/api-reference)
-- [Deployment](https://socialapparatus.com/docs/deployment)
-
-## Contributing
-
-Contributions are welcome! Please read our contributing guidelines before submitting a pull request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## Security
-
-If you discover a security vulnerability, please send an email to security@socialapparatus.com. All security vulnerabilities will be promptly addressed.
-
-## License
-
-SocialApparatus is open-sourced software licensed under the [MIT license](LICENSE).
-
----
-
-<p align="center">
-  Built with ❤️ by <a href="https://sbarron.com">Shane Barron</a>
-</p>
