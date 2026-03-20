@@ -25,7 +25,7 @@
 
             <!-- Footer -->
             <footer class="py-6 text-center text-sm text-surface-600 dark:text-surface-400">
-                <p>Powered by <a href="https://socialapparatus.com" target="_blank" class="text-primary-600 dark:text-primary-400 hover:underline font-medium">SocialApparatus</a> · Built with love by <a href="https://sbarron.com" target="_blank" class="text-primary-600 dark:text-primary-400 hover:underline font-medium">Shane Barron</a></p>
+                <p>Open source under the MIT License.</p>
             </footer>
         </div>
 

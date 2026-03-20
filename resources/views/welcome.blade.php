@@ -1002,7 +1002,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>Built with love by <a href="https://sbarron.com">Shane Barron</a>. Open source under the MIT License.</p>
+                <p>Open source under the MIT License.</p>
             </div>
         </div>
     </footer>
