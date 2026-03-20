@@ -16,6 +16,7 @@ class Upload extends Component
     public ?int $albumId = null;
     public string $privacy = 'public';
     public bool $showModal = false;
+    public array $uploadedFiles = [];
 
     protected $listeners = ['openUploadModal' => 'openModal'];
 
@@ -33,26 +34,42 @@ class Upload extends Component
     public function closeModal()
     {
         $this->showModal = false;
-        $this->reset(['files']);
+        $this->reset(['files', 'uploadedFiles']);
+    }
+
+    public function updatedFiles()
+    {
+        $this->validate([
+            'files.*' => 'required|file|mimes:jpg,jpeg,png,gif,mp4,mov,avi,webm|max:51200',
+        ]);
+
+        foreach ($this->files as $file) {
+            $this->uploadedFiles[] = [
+                'file' => $file,
+                'name' => $file->getClientOriginalName(),
+                'size' => $file->getSize(),
+                'preview' => $file->isPreviewable() ? $file->temporaryUrl() : null,
+            ];
+        }
+        $this->files = [];
     }
 
     public function removeFile($index)
     {
-        unset($this->files[$index]);
-        $this->files = array_values($this->files);
+        unset($this->uploadedFiles[$index]);
+        $this->uploadedFiles = array_values($this->uploadedFiles);
     }
 
     public function upload()
     {
-        $this->validate($this->rules);
-
-        if (empty($this->files)) {
+        if (empty($this->uploadedFiles)) {
             return;
         }
 
         $user = auth()->user();
 
-        foreach ($this->files as $file) {
+        foreach ($this->uploadedFiles as $uploadedFile) {
+            $file = $uploadedFile['file'];
             $extension = $file->getClientOriginalExtension();
             $filename = Str::random(40) . '.' . $extension;
             $path = $file->storeAs('media/' . $user->id, $filename, 'public');
